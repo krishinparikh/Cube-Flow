@@ -1,0 +1,129 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: HK Grotesk;
+  text-align: center;
+}
+
+header {
+  background-color: rgb(0, 0, 0);
+}
+
+#logo {
+  padding-top: 10px;
+}
+
+#logo a {
+  font-family: Hemi Head;
+  font-style: italic;
+  font-size: 3rem;
+  font-weight: bold;
+  text-decoration: none;
+  background: #FC0000;
+  background-clip: border-box;
+  background: -webkit-linear-gradient(to right, #FC0000 0%, #FFFF00 33%, #00ED00 67%, #006FFF 100%);
+  background: -moz-linear-gradient(to right, #FC0000 0%, #FFFF00 33%, #00ED00 67%, #006FFF 100%);
+  background: linear-gradient(to right, #FC0000 0%, #FFFF00 33%, #00ED00 67%, #006FFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 5px;
+}
+
+#scramble {
+  font-size: 2rem;
+  word-spacing: 15px;
+  color: white;
+  padding: 30px 0px 15px 0px;
+}
+
+#timer {
+  font-family: Lekton;
+  font-weight: bold;
+  font-size: 15rem;
+  margin-top: 100px;
+}
+
+#buttons {
+  margin: 20px 0px 40px 0px;;
+}
+
+button {
+  border-radius: 40px;
+  border-style: none;
+  height: 60px;
+  width: 15%;
+  font-family: HK Grotesk;
+  font-size: 1rem;
+  margin: 0px 15px;
+  background-color: white;
+  border: 2px solid black;
+}
+
+button:hover {
+  background-color: black;
+  color: white;
+  cursor: pointer;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#stats {
+  font-size: 1rem;
+}
+
+#stats p {
+  margin-bottom: 10px;
+}
+
+/* The Modal (background) */
+#modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: hidden; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+  padding-top: 8%;
+}
+
+/* Modal Content/Box */
+#modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 25px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  height: 80%;
+  overflow: auto;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 0px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 12px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
