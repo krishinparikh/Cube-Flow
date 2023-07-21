@@ -6,10 +6,13 @@
 import { app, db, auth, provider } from './firebase';
 
 // Functions from firebase.js
-import { getFirestore, doc, setDoc, collection, getDoc, getDocs, addDoc, query, orderBy, limit, where, serverTimestamp, getAuth, signInWithPopup, GoogleAuthProvider, signInWithRedirect } from './firebase';
+import { getFirestore, doc, setDoc, collection, getDoc, getDocs, addDoc, query, orderBy, limit, where, serverTimestamp, getAuth, signInWithPopup, GoogleAuthProvider, signInWithRedirect, signOut } from './firebase';
 
+export let loggedIn = document.getElementById('loggedIn');
+export let loggedOut = document.getElementById('loggedOut');
+export let accountImg = document.getElementById('accountImg');
 export let scramble = document.getElementById('scramble');
-export let loginButton = document.getElementById('login');
+export let loginButton = document.getElementById('loginButton');
 export let timer = document.getElementById('timer');
 export let current = document.getElementById('current');
 export let best = document.getElementById('best');
@@ -129,10 +132,17 @@ export function updateTimer() {
 
 export function generateScramble() {
   let scrambleArray = [];
+  let previousMove = "";
   let s = "";
   
   for (let i = 0; i < 20; i++) {
-    scrambleArray.push(moves[Math.floor(Math.random() * 18)]);
+    let currentMove;
+    do {
+      currentMove = moves[Math.floor(Math.random() * moves.length)];
+    } while (areSameSide(previousMove, currentMove) || areOpposites(previousMove, currentMove));
+
+    scrambleArray.push(currentMove);
+    previousMove = currentMove;
   }
 
   for (let i = 0; i < scrambleArray.length; i++) {
@@ -140,6 +150,15 @@ export function generateScramble() {
   }
 
   scramble.innerHTML = s;
+}
+
+function areSameSide(previousMove, currentMove) {
+  return previousMove[0] === currentMove[0];
+}
+
+function areOpposites(previousMove, currentMove) {
+  const opposites = { "F": "B", "B": "F", "R": "L", "L": "R", "U": "D", "D": "U" };
+  return opposites[previousMove[0]] === currentMove[0];
 }
 
 /**
@@ -171,25 +190,19 @@ export async function addSolve() {
 /**
  * Generates existing times on page open or reload
  */
-export function generateTimes() {
-  const q = query(collection(db, "solves"), orderBy("timestamp"));
+export async function generateTimes(user) {
+  const solvesCollection = await getDocs(collection(db, 'users', user.uid, 'solves'), orderBy("timestamp"));
 
-  getDocs(q)
-  .then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      let row = table.insertRow(1);
-      let timeCell = row.insertCell(0);
-      let scrambleCell = row.insertCell(1);
-      let timestampCell = row.insertCell(2);
-      
-      timeCell.innerHTML = intToTime(doc.data().time);
-      scrambleCell.innerHTML = doc.data().scramble;
-      timestampCell.innerHTML = new Date(doc.data().timestamp.toMillis()).toLocaleString();
-    });
-  })
-  .catch((error) => {
-    console.log("Error getting documents: ", error);
+  solvesCollection.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    let row = table.insertRow(1);
+    let timeCell = row.insertCell(0);
+    let scrambleCell = row.insertCell(1);
+    let timestampCell = row.insertCell(2);
+    
+    timeCell.innerHTML = intToTime(doc.data().time);
+    scrambleCell.innerHTML = doc.data().scramble;
+    timestampCell.innerHTML = new Date(doc.data().timestamp.toMillis()).toLocaleString();
   });
 
 }
@@ -214,4 +227,35 @@ export async function login() {
     const credential = GoogleAuthProvider.credentialFromError(error);
     // ...
   });
+}
+
+export async function logOut() {
+  signOut(auth).then(() => {
+    // Sign-out successful.
+  }).catch((error) => {
+    // An error happened.
+  });
+}
+
+export async function addUser(user) {
+  const docRef = doc(db, "users", user.uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    console.log("Document data:", docSnap.data());
+  } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+    await setDoc(doc(db, "users", user.uid));
+  }
+}
+
+export function displayLoggedIn() {
+  loggedIn.style.display = 'visible';
+  loggedOut.style.display = 'none';
+}
+
+export function displayLoggedOut() {
+  loggedOut.style.display = 'visible';
+  loggedIn.style.display = 'none';
 }

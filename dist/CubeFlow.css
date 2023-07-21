@@ -14,11 +14,11 @@ body {
 }
 
 header {
-  background-color: rgb(0, 0, 0);
+  background-color: rgb(12, 63, 108);
 }
 
 #logo {
-  padding-top: 10px;
+  padding: 10px 0px 10px 0px;;
 }
 
 #logo a {
@@ -37,11 +37,18 @@ header {
   padding: 5px;
 }
 
+#accountImg {
+  border-radius: 100px;
+  width: 50px;
+  position: absolute;
+  top: 13px;
+  right: 50px;
+}
+
 #scramble {
   font-size: 2rem;
   word-spacing: 15px;
-  color: white;
-  padding: 30px 0px 15px 0px;
+  margin-top: 20px;
 }
 
 #timer {

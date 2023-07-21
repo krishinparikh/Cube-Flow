@@ -4,10 +4,11 @@ Calls functions from other JS files
 */
 
 // Variables from CubeFlow.js
-import { scramble, loginButton, timer, current, best, avg5, avg12, hide, viewTimesButton, resetButton, modal, minutes, seconds, milliseconds, time, running, reset, active, moves, table } from './CubeFlow';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { accountImg, scramble, loginButton, timer, current, best, avg5, avg12, hide, viewTimesButton, resetButton, modal, minutes, seconds, milliseconds, time, running, reset, active, moves, table } from './CubeFlow';
 
 // Functions from CubeFlow.js
-import { startTimer, stopTimer, generateCurrentTime, generateBestTime, timeToInt, intToTime, resetTimer, updateTimer, generateScramble, addSolve, generateTimes, login } from './CubeFlow';
+import { startTimer, stopTimer, generateCurrentTime, generateBestTime, timeToInt, intToTime, resetTimer, updateTimer, generateScramble, addSolve, generateTimes, login, logOut, addUser, displayLoggedIn, displayLoggedOut } from './CubeFlow';
 
 // Variables from firebase.js
 import { app, db, auth, provider } from './firebase';
@@ -76,4 +77,17 @@ window.addEventListener('load', generateTimes);
 Login functions
 */
 
-loginButton.addEventListener('click', login)
+accountImg.addEventListener('click', logOut);
+loginButton.addEventListener('click', login);
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    addUser(user);
+    accountImg.src = user.photoURL;
+    generateTimes(user);
+    
+  } else {
+    console.log('not logged in mothafucka');
+    accountImg.src = '';
+  }
+})

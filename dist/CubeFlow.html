@@ -11,38 +11,45 @@
 </head>
 
 <body>
-  <header class="hide">
-    <div id="logo"><a href="CubeFlow.html">CubeFlow</a></div>
-    <p id="scramble"></p>
-  </header>
-
-  <button id="login">Login</button>
-
-  <div id="timer">00:00.00</div>
-
-  <div class="hide" id="buttons">
-    <button id="view-times">View Times</button>
-    <button id="reset">Reset</button>
-    <button id="delete">View Stats</button>
-  </div>
-
-  <div class="hide" id="stats">
-    <p>Current Time: <span id="current"></span></p>
-    <p>Best Time: <span id="best"></span></p>
-    <p>Average of 5: <span id="avg5"></span></p>
-    <p>Average of 12: <span id="avg12"></span></p>
+  <div id="loggedIn">
+    <header class="hide">
+      <div id="logo"><a href="CubeFlow.html">CubeFlow</a></div>
+      <img id="accountImg" src="">
+    </header>
+    
+    <p class="hide" id="scramble"></p>
+  
+    <div id="timer">00:00.00</div>
+  
+    <div class="hide" id="buttons">
+      <button id="view-times">View Times</button>
+      <button id="reset">Reset</button>
+      <button id="delete">View Stats</button>
+    </div>
+  
+    <div class="hide" id="stats">
+      <p>Current Time: <span id="current"></span></p>
+      <p>Best Time: <span id="best"></span></p>
+      <p>Average of 5: <span id="avg5"></span></p>
+      <p>Average of 12: <span id="avg12"></span></p>
+    </div>
+    
+    <div class="hide" id="modal">
+      <div id="modal-content">      
+        <table id="table">
+          <tr>
+            <th>Time</th>
+            <th>Scramble</th>
+            <th>Timestamp</th>
+          </tr>
+        </table>
+      </div>
+    </div>
   </div>
   
-  <div class="hide" id="modal">
-    <div id="modal-content">      
-      <table id="table">
-        <tr>
-          <th>Time</th>
-          <th>Scramble</th>
-          <th>Timestamp</th>
-        </tr>
-      </table>
-    </div>
+
+  <div id="loggedOut">
+    <img id="loginButton" src="../assets/google_sign_in.png" width="200px">
   </div>
   
   <script src="./bundle.js"></script>
