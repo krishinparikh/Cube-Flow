@@ -5,10 +5,11 @@ Calls functions from other JS files
 
 // Variables from CubeFlow.js
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { accountImg, scramble, loginButton, timer, current, best, avg5, avg12, hide, viewTimesButton, resetButton, modal, minutes, seconds, milliseconds, time, running, reset, active, moves, table } from './CubeFlow';
+
+import { body, signedIn, loggedIn, loggedOut, accountImg, signOutButton, scramble, logInButton, timer, current, best, avg5, avg12, hide, viewTimesButton, resetButton, modal, minutes, seconds, milliseconds, time, running, reset, active, moves, table, dropdown } from './CubeFlow';
 
 // Functions from CubeFlow.js
-import { startTimer, stopTimer, generateCurrentTime, generateBestTime, timeToInt, intToTime, resetTimer, updateTimer, generateScramble, addSolve, generateTimes, login, logOut, addUser, displayLoggedIn, displayLoggedOut } from './CubeFlow';
+import { startTimer, stopTimer, generateCurrentTime, generateBestTime, timeToInt, intToTime, resetTimer, updateTimer, generateScramble, addSolve, generateTimes, login, logOut, getExistingUser } from './CubeFlow';
 
 // Variables from firebase.js
 import { app, db, auth, provider } from './firebase';
@@ -19,6 +20,16 @@ import { getFirestore, doc, setDoc, collection, getDoc, getDocs, addDoc, query, 
 /*
 CubeFlow functions
 */
+
+accountImg.addEventListener('click', () => {
+  if (dropdown.style.display === "none" || dropdown.style.display === "") {
+    dropdown.style.display = "block";
+    active = false;
+  } else {
+    dropdown.style.display = "none";
+    active = true;
+  }
+});
 
 resetButton.addEventListener('click', resetTimer);
 
@@ -77,17 +88,22 @@ window.addEventListener('load', generateTimes);
 Login functions
 */
 
-accountImg.addEventListener('click', logOut);
-loginButton.addEventListener('click', login);
+signOutButton.addEventListener('click', logOut);
+logInButton.addEventListener('click', login);
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    addUser(user);
+    loggedIn.style.display = 'block';
+    loggedOut.style.display = 'none';
+    body.style.backgroundColor = 'white';
+    dropdown.style.display = 'none';
+    getExistingUser(user);
     accountImg.src = user.photoURL;
     generateTimes(user);
-    
   } else {
-    console.log('not logged in mothafucka');
+    loggedIn.style.display = 'none';
+    loggedOut.style.display = 'block';
+    body.style.backgroundColor = 'rgb(12, 63, 108)';
     accountImg.src = '';
   }
 })

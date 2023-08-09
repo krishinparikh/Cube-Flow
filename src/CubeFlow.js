@@ -8,11 +8,16 @@ import { app, db, auth, provider } from './firebase';
 // Functions from firebase.js
 import { getFirestore, doc, setDoc, collection, getDoc, getDocs, addDoc, query, orderBy, limit, where, serverTimestamp, getAuth, signInWithPopup, GoogleAuthProvider, signInWithRedirect, signOut } from './firebase';
 
+export let body = document.body;
+export let signedInUser = "";
+export let signedIn = false;
 export let loggedIn = document.getElementById('loggedIn');
 export let loggedOut = document.getElementById('loggedOut');
 export let accountImg = document.getElementById('accountImg');
+export let dropdown = document.getElementById('dropdown');
+export let signOutButton = document.getElementById('sign-out');
 export let scramble = document.getElementById('scramble');
-export let loginButton = document.getElementById('loginButton');
+export let logInButton = document.getElementById('google-button');
 export let timer = document.getElementById('timer');
 export let current = document.getElementById('current');
 export let best = document.getElementById('best');
@@ -166,13 +171,13 @@ function areOpposites(previousMove, currentMove) {
  * to be displayed in 'view times'
  */
 export async function addSolve() {
-  await addDoc(collection(db, "solves"), {
+  await addDoc(collection(db, "users", "bH1l7XSc4FfoeX7hHgMQXeJe4rf1", "solves"), {
     time: timeToInt(timer.innerHTML),
     timestamp: serverTimestamp(),
     scramble: scramble.innerHTML
   });
   
-  const q = query(collection(db, "solves"), orderBy("timestamp", "desc"), limit(1));
+  const q = query(collection(db, "users", "bH1l7XSc4FfoeX7hHgMQXeJe4rf1", "solves"), orderBy("timestamp", "desc"), limit(1));
 
   getDocs(q)
   .then((querySnapshot) => {
@@ -237,7 +242,7 @@ export async function logOut() {
   });
 }
 
-export async function addUser(user) {
+export async function getExistingUser(user) {
   const docRef = doc(db, "users", user.uid);
   const docSnap = await getDoc(docRef);
 
@@ -248,14 +253,4 @@ export async function addUser(user) {
     console.log("No such document!");
     await setDoc(doc(db, "users", user.uid));
   }
-}
-
-export function displayLoggedIn() {
-  loggedIn.style.display = 'visible';
-  loggedOut.style.display = 'none';
-}
-
-export function displayLoggedOut() {
-  loggedOut.style.display = 'visible';
-  loggedIn.style.display = 'none';
 }
