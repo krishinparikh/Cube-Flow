@@ -6,16 +6,19 @@ Calls functions from other JS files
 // Variables from CubeFlow.js
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
-import { body, signedIn, loggedIn, loggedOut, accountImg, signOutButton, scramble, logInButton, timer, current, best, avg5, avg12, hide, viewTimesButton, resetButton, modal, minutes, seconds, milliseconds, time, running, reset, active, moves, table, dropdown } from './CubeFlow';
+import { body, signedIn, loggedIn, loggedOut, accountImg, dropdown, dropdownName, dropdownEmail, signOutButton, scramble, logInButton, timer, best, avg5, avg12, hide, viewTimesButton, resetButton, modal, minutes, seconds, milliseconds, time, running, reset, active, moves, table, generateAvg5, generateAvg12 } from './CubeFlow';
 
 // Functions from CubeFlow.js
-import { startTimer, stopTimer, generateCurrentTime, generateBestTime, timeToInt, intToTime, resetTimer, updateTimer, generateScramble, addSolve, generateTimes, login, logOut, getExistingUser } from './CubeFlow';
+import { startTimer, stopTimer, generateBestTime, timeToInt, intToTime, resetTimer, updateTimer, generateScramble, addSolve, generateTimes, login, logOut, getExistingUser } from './CubeFlow';
 
 // Variables from firebase.js
 import { app, db, auth, provider } from './firebase';
 
 // Functions from firebase.js
 import { getFirestore, doc, setDoc, collection, getDoc, getDocs, addDoc, query, orderBy, limit, where, serverTimestamp, getAuth, signInWithPopup, GoogleAuthProvider, signInWithRedirect } from './firebase';
+
+// 'user' object from onAuthStateChanged
+export let signedInUser = "";
 
 /*
 CubeFlow functions
@@ -79,10 +82,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-window.addEventListener('load', generateScramble);
-window.addEventListener('load', generateCurrentTime);
 window.addEventListener('load', generateBestTime);
-window.addEventListener('load', generateTimes);
 
 /*
 Login functions
@@ -93,17 +93,26 @@ logInButton.addEventListener('click', login);
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    signedInUser = user;
+    console.log(signedInUser.uid + " has signed in.")
     loggedIn.style.display = 'block';
     loggedOut.style.display = 'none';
     body.style.backgroundColor = 'white';
     dropdown.style.display = 'none';
-    getExistingUser(user);
     accountImg.src = user.photoURL;
-    generateTimes(user);
+    dropdownName.innerHTML = user.displayName;
+    dropdownEmail.innerHTML = user.email;
+    resetTimer();
+    getExistingUser();
+    generateTimes();
+    generateScramble();
+    generateBestTime();
+    generateAvg5();
+    generateAvg12();
   } else {
+    console.log("Signed out.")
     loggedIn.style.display = 'none';
     loggedOut.style.display = 'block';
     body.style.backgroundColor = 'rgb(12, 63, 108)';
-    accountImg.src = '';
   }
 })

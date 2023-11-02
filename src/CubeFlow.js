@@ -8,18 +8,21 @@ import { app, db, auth, provider } from './firebase';
 // Functions from firebase.js
 import { getFirestore, doc, setDoc, collection, getDoc, getDocs, addDoc, query, orderBy, limit, where, serverTimestamp, getAuth, signInWithPopup, GoogleAuthProvider, signInWithRedirect, signOut } from './firebase';
 
+// Variables from index.js
+import { signedInUser } from './index'
+
 export let body = document.body;
-export let signedInUser = "";
 export let signedIn = false;
 export let loggedIn = document.getElementById('loggedIn');
 export let loggedOut = document.getElementById('loggedOut');
 export let accountImg = document.getElementById('accountImg');
 export let dropdown = document.getElementById('dropdown');
+export let dropdownName = document.getElementById('dropdown-name');
+export let dropdownEmail = document.getElementById('dropdown-email');
 export let signOutButton = document.getElementById('sign-out');
 export let scramble = document.getElementById('scramble');
 export let logInButton = document.getElementById('google-button');
 export let timer = document.getElementById('timer');
-export let current = document.getElementById('current');
 export let best = document.getElementById('best');
 export let avg5 = document.getElementById('avg5');
 export let avg12 = document.getElementById('avg12');
@@ -59,29 +62,44 @@ export function stopTimer() {
 
     addSolve();
     generateScramble();
-
-    times.push(timeToInt(timer.innerHTML));
-
-    generateCurrentTime();
     generateBestTime();
+    generateAvg5();
+    generateAvg12();
   }
 }
 
-export function generateCurrentTime() {
-  const q = query(collection(db, "solves"), orderBy("timestamp", "desc"), limit(1));
-
-  getDocs(q)
-  .then((querySnapshot) => {
-    current.innerHTML = intToTime(querySnapshot.docs[0].data().time);
-  });
-}
-
 export function generateBestTime() {
-  const q = query(collection(db, "solves"), orderBy("time"), limit(1));
+  const q = query(collection(db, "users", signedInUser.uid, "solves"), orderBy("time"), limit(1));
 
   getDocs(q)
   .then((querySnapshot) => {
     best.innerHTML = intToTime(querySnapshot.docs[0].data().time);
+  });
+}
+
+export function generateAvg5() {
+  const q = query(collection(db, "users", signedInUser.uid, "solves"), orderBy("timestamp", "desc"), limit(5));
+  let x = 0;
+
+  getDocs(q)
+  .then((querySnapshot) => {
+    for (let i = 0; i < 5; i++) {
+      x = x + querySnapshot.docs[i].data().time;
+    }
+    avg5.innerHTML = intToTime(x/5);
+  });
+}
+
+export function generateAvg12() {
+  const q = query(collection(db, "users", signedInUser.uid, "solves"), orderBy("timestamp", "desc"), limit(12));
+  let x = 0;
+
+  getDocs(q)
+  .then((querySnapshot) => {
+    for (let i = 0; i < 12; i++) {
+      x = x + querySnapshot.docs[i].data().time;
+    }
+    avg12.innerHTML = intToTime(x/12);
   });
 }
 
@@ -171,13 +189,13 @@ function areOpposites(previousMove, currentMove) {
  * to be displayed in 'view times'
  */
 export async function addSolve() {
-  await addDoc(collection(db, "users", "bH1l7XSc4FfoeX7hHgMQXeJe4rf1", "solves"), {
+  await addDoc(collection(db, "users", signedInUser.uid, "solves"), {
     time: timeToInt(timer.innerHTML),
     timestamp: serverTimestamp(),
     scramble: scramble.innerHTML
   });
   
-  const q = query(collection(db, "users", "bH1l7XSc4FfoeX7hHgMQXeJe4rf1", "solves"), orderBy("timestamp", "desc"), limit(1));
+  const q = query(collection(db, "users", signedInUser.uid, "solves"), orderBy("timestamp", "desc"), limit(1));
 
   getDocs(q)
   .then((querySnapshot) => {
@@ -185,18 +203,20 @@ export async function addSolve() {
     let timeCell = row.insertCell(0);
     let scrambleCell = row.insertCell(1);
     let timestampCell = row.insertCell(2);
+    let xCell = row.insertCell(3);
 
     timeCell.innerHTML = intToTime(querySnapshot.docs[0].data().time);
     scrambleCell.innerHTML = querySnapshot.docs[0].data().scramble;
     timestampCell.innerHTML = new Date(querySnapshot.docs[0].data().timestamp.toMillis()).toLocaleString();
+    xCell.innerHTML = "<b>x</b>";
   });
 }
 
 /**
  * Generates existing times on page open or reload
  */
-export async function generateTimes(user) {
-  const solvesCollection = await getDocs(collection(db, 'users', user.uid, 'solves'), orderBy("timestamp"));
+export async function generateTimes() {
+  const solvesCollection = await getDocs(query(collection(db, 'users', signedInUser.uid, 'solves'), orderBy("timestamp")));
 
   solvesCollection.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
@@ -204,10 +224,12 @@ export async function generateTimes(user) {
     let timeCell = row.insertCell(0);
     let scrambleCell = row.insertCell(1);
     let timestampCell = row.insertCell(2);
+    let xCell = row.insertCell(3);
     
     timeCell.innerHTML = intToTime(doc.data().time);
     scrambleCell.innerHTML = doc.data().scramble;
     timestampCell.innerHTML = new Date(doc.data().timestamp.toMillis()).toLocaleString();
+    xCell.innerHTML = "<b>x</b>";
   });
 
 }
@@ -242,15 +264,13 @@ export async function logOut() {
   });
 }
 
-export async function getExistingUser(user) {
-  const docRef = doc(db, "users", user.uid);
-  const docSnap = await getDoc(docRef);
+export async function getExistingUser() {
+  const docSnap = await getDoc(doc(db, "users", signedInUser.uid));
 
   if (docSnap.exists()) {
     console.log("Document data:", docSnap.data());
   } else {
-    // docSnap.data() will be undefined in this case
-    console.log("No such document!");
-    await setDoc(doc(db, "users", user.uid));
+    console.log(signedInUser.uid + " not found");
+    await setDoc(doc(db, "users", signedInUser.uid), {});
   }
 }
